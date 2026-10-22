@@ -1,0 +1,13 @@
+{
+  "discordToken": "",
+  "discordChannelId": "",
+  "cronSchedule": "0 18 * * *",
+  "cronTimezone": "Asia/Jakarta",
+  "pubgApiKey": "",
+  "port": 3000,
+  "vps": {
+    "host": "43.156.17.135",
+    "port": 22,
+    "username": "ubuntu"
+  }
+}

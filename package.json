@@ -1,0 +1,31 @@
+{
+  "name": "bot-scrap-pubg-stat",
+  "version": "1.0.0",
+  "description": "PUBG Steam Stats Scraper, Leaderboard Dashboard & Discord Daily Banter Bot",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "deploy:vps": "node scripts/deploy-vps.js"
+  },
+  "keywords": [
+    "pubg",
+    "scraper",
+    "discord-bot",
+    "steam",
+    "leaderboard",
+    "gaming"
+  ],
+  "author": "Antigravity",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3",
+    "ssh2": "^1.16.0"
+  }
+}

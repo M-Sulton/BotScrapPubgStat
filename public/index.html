@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HERMES VPS - Cloud Server & Infrastructure Monitor</title>
+  <meta name="description" content="Dashboard monitoring real-time VPS Hermes: performa CPU, RAM, Disk, grafik timeline, dan status service PM2 (PUBG Tracker Bot & Hermes AI).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="vps-dashboard.css">
+</head>
+<body class="pubg-theme vps-body">
+  <div class="hud-overlay"></div>
+  <div class="ambient-glow vps-glow"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="tactical-header vps-header">
+    <div class="header-left">
+      <div class="server-badge">
+        <i class="fa-solid fa-server server-logo-icon"></i>
+        <div>
+          <span class="server-brand">HERMES VPS</span>
+          <span class="server-tagline">CLOUD INFRASTRUCTURE MONITOR</span>
+        </div>
+      </div>
+      <div class="header-divider"></div>
+      <div class="vps-ip-chip">
+        <i class="fa-solid fa-network-wired"></i>
+        <span>43.156.17.135</span>
+        <div class="live-dot pulse"></div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="tactical-clock" id="live-clock">
+        <i class="fa-regular fa-clock"></i>
+        <span id="clock-time">--:--:-- WIB</span>
+        <span class="clock-label" id="uptime-display">UPTIME: MEMUAT...</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <nav class="vps-nav">
+        <a href="/" class="nav-link active">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>SERVER MONITOR</span>
+        </a>
+        <a href="/pubg-scrap" class="nav-link pubg-link" title="Buka Dashboard Scrap PUBG & Bot Discord">
+          <i class="fa-solid fa-crosshairs text-amber"></i>
+          <span>PUBG SCRAP BOT</span>
+          <span class="mini-route">/pubg-scrap</span>
+        </a>
+        <a href="/logout" class="nav-link logout-btn" title="Keluar dari sesi" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>LOGOUT</span>
+        </a>
+      </nav>
+
+      <button id="btn-open-hermes" class="btn-tactical btn-hermes" title="Hermes AI Hub (OpenRouter, Telegram, Discord)">
+        <i class="fa-solid fa-brain"></i>
+        <span>HERMES AI</span>
+        <div class="hermes-pulse-dot"></div>
+      </button>
+
+      <button id="btn-refresh-metrics" class="btn-tactical btn-icon" title="Refresh Metrik Sekarang">
+        <i class="fa-solid fa-arrows-rotate" id="refresh-metrics-icon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="dashboard-container vps-container">
+    <!-- Server Spec Banner -->
+    <section class="vps-hero-card">
+      <div class="vps-hero-main">
+        <div class="server-status-pill">
+          <span class="pulse-beacon"></span>
+          <span>SYSTEM ONLINE & HEALTHY</span>
+        </div>
+        <h1 class="vps-title">UBUNTU 24.04 LTS SERVER</h1>
+        <p class="vps-desc">
+          Monitoring performa sistem VPS Hermes secara real-time, utilisasi CPU, memori RAM, penyimpanan disk, status daemon PM2, serta pusat kontrol AI Assistant & Bot PUBG.
+        </p>
+      </div>
+
+      <div class="server-quick-specs">
+        <div class="spec-pill">
+          <i class="fa-solid fa-microchip text-cyan"></i>
+          <div>
+            <span class="spec-label">CPU Cores</span>
+            <span class="spec-val" id="spec-cpu-cores">2 vCPUs</span>
+          </div>
+        </div>
+        <div class="spec-pill">
+          <i class="fa-solid fa-memory text-violet"></i>
+          <div>
+            <span class="spec-label">Total RAM</span>
+            <span class="spec-val" id="spec-ram-total">3.6 GB</span>
+          </div>
+        </div>
+        <div class="spec-pill">
+          <i class="fa-solid fa-hard-drive text-amber"></i>
+          <div>
+            <span class="spec-label">NVMe Disk</span>
+            <span class="spec-val" id="spec-disk-total">59 GB</span>
+          </div>
+        </div>
+        <div class="spec-pill">
+          <i class="fa-solid fa-location-dot text-green"></i>
+          <div>
+            <span class="spec-label">Region</span>
+            <span class="spec-val">Singapore (Tencent)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 Real-time KPI Metric Gauges -->
+    <section class="vps-kpi-grid">
+      <!-- CPU KPI -->
+      <div class="vps-card kpi-gauge-card cyan-border">
+        <div class="kpi-header">
+          <div class="kpi-title-wrap">
+            <i class="fa-solid fa-microchip text-cyan"></i>
+            <span>CPU UTILIZATION</span>
+          </div>
+          <span class="kpi-badge badge-cyan" id="cpu-load-badge">Load: 0.05</span>
+        </div>
+        <div class="kpi-big-metric">
+          <span class="kpi-big-num cyan-text" id="cpu-percent">0%</span>
+          <span class="kpi-unit">utilization</span>
+        </div>
+        <div class="metric-progress-bar">
+          <div class="metric-fill fill-cyan" id="cpu-progress-fill" style="width: 5%;"></div>
+        </div>
+        <div class="kpi-footer-meta">
+          <span id="cpu-model-text">Intel / AMD vCPU (2 Cores)</span>
+          <span id="cpu-load-detail">1m: 0.05 | 5m: 0.08</span>
+        </div>
+      </div>
+
+      <!-- RAM KPI -->
+      <div class="vps-card kpi-gauge-card violet-border">
+        <div class="kpi-header">
+          <div class="kpi-title-wrap">
+            <i class="fa-solid fa-memory text-violet"></i>
+            <span>RAM (MEMORY)</span>
+          </div>
+          <span class="kpi-badge badge-violet" id="ram-used-badge">1.1 / 3.6 GB</span>
+        </div>
+        <div class="kpi-big-metric">
+          <span class="kpi-big-num text-violet" id="ram-percent">0%</span>
+          <span class="kpi-unit">used</span>
+        </div>
+        <div class="metric-progress-bar">
+          <div class="metric-fill fill-violet" id="ram-progress-fill" style="width: 29%;"></div>
+        </div>
+        <div class="kpi-footer-meta">
+          <span id="ram-free-text">Tersedia: 2.5 GB</span>
+          <span id="ram-swap-text">Swap: Aktif</span>
+        </div>
+      </div>
+
+      <!-- Disk KPI -->
+      <div class="vps-card kpi-gauge-card amber-border">
+        <div class="kpi-header">
+          <div class="kpi-title-wrap">
+            <i class="fa-solid fa-hard-drive text-amber"></i>
+            <span>STORAGE (DISK)</span>
+          </div>
+          <span class="kpi-badge badge-amber" id="disk-used-badge">12G / 59G</span>
+        </div>
+        <div class="kpi-big-metric">
+          <span class="kpi-big-num gold-text" id="disk-percent">21%</span>
+          <span class="kpi-unit">occupied</span>
+        </div>
+        <div class="metric-progress-bar">
+          <div class="metric-fill fill-amber" id="disk-progress-fill" style="width: 21%;"></div>
+        </div>
+        <div class="kpi-footer-meta">
+          <span id="disk-free-text">Sisa: 45 GB Bebas</span>
+          <span>Root: /dev/vda2</span>
+        </div>
+      </div>
+
+      <!-- PM2 Services KPI -->
+      <div class="vps-card kpi-gauge-card green-border">
+        <div class="kpi-header">
+          <div class="kpi-title-wrap">
+            <i class="fa-solid fa-network-wired text-green"></i>
+            <span>PM2 DAEMON SERVICES</span>
+          </div>
+          <span class="kpi-badge badge-green" id="pm2-count-badge">2 Online</span>
+        </div>
+        <div class="kpi-big-metric">
+          <span class="kpi-big-num text-green" id="pm2-online-num">2 / 2</span>
+          <span class="kpi-unit">running</span>
+        </div>
+        <div class="metric-progress-bar">
+          <div class="metric-fill fill-green" style="width: 100%;"></div>
+        </div>
+        <div class="kpi-footer-meta">
+          <span>pubg-tracker-bot (3000)</span>
+          <span>hermes-ai-bot (3001)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Real-time Live Charts Section -->
+    <section class="vps-charts-section">
+      <div class="vps-card chart-card">
+        <div class="card-header-tactical">
+          <div class="card-title-group">
+            <i class="fa-solid fa-chart-area text-cyan"></i>
+            <span class="card-title">REAL-TIME CPU & RAM TIMELINE</span>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot dot-cyan"></span> CPU %</span>
+            <span class="legend-item"><span class="legend-dot dot-violet"></span> RAM %</span>
+            <span class="legend-sync"><i class="fa-solid fa-wifi fa-fade"></i> Live (2s)</span>
+          </div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="vps-timeline-canvas" height="180"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Service Power Controls & Eco Mode (Stop / Start buttons for 0% CPU & RAM usage) -->
+    <section class="service-controls-section">
+      <div class="vps-card control-panel-card">
+        <div class="card-header-tactical">
+          <div class="card-title-group">
+            <i class="fa-solid fa-power-off text-amber"></i>
+            <span class="card-title">KONTROL SERVICE & PENGHEMATAN DAYA (0% USAGE CPU & RAM)</span>
+          </div>
+          <div class="eco-master-wrap">
+            <button type="button" id="btn-toggle-sleep-mode" class="btn-tactical btn-eco" title="Hentikan bot untuk menghemat 100% RAM & CPU">
+              <i class="fa-solid fa-moon" id="sleep-mode-icon"></i>
+              <span id="sleep-mode-btn-text">MODE HEMAT DAYA (STOP SEMUA BOT)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="control-services-grid">
+          <!-- Control Item 1: Hermes AI Chat Bot -->
+          <div class="control-box box-violet">
+            <div class="control-box-header">
+              <div class="c-info">
+                <i class="fa-solid fa-brain text-violet"></i>
+                <div>
+                  <strong>Hermes AI Bot Service</strong>
+                  <span class="c-sub">PM2: hermes-ai-bot • Port 3001</span>
+                </div>
+              </div>
+              <span class="indicator-badge badge-on" id="ctrl-hermes-status-badge">ONLINE</span>
+            </div>
+            <p class="control-desc">
+              Menangani bot Telegram, bot Discord, dan integrasi OpenRouter. Hentikan service ini untuk melepaskan <b>~99 MB RAM</b> dan 0% CPU saat tidak digunakan.
+            </p>
+            <div class="control-metrics-mini">
+              <span>RAM Terpakai: <strong id="ctrl-hermes-ram">98 MB</strong></span>
+              <span>CPU: <strong id="ctrl-hermes-cpu">0%</strong></span>
+            </div>
+            <div class="control-btn-group">
+              <button type="button" class="btn-ctrl btn-stop-danger" id="btn-hermes-stop" title="Hentikan Service via PM2 (Hemat 99MB RAM)">
+                <i class="fa-solid fa-stop"></i> STOP SERVICE
+              </button>
+              <button type="button" class="btn-ctrl btn-start-success" id="btn-hermes-start" style="display: none;" title="Nyalakan Service via PM2">
+                <i class="fa-solid fa-play"></i> START SERVICE
+              </button>
+              <button type="button" class="btn-ctrl btn-restart-secondary" id="btn-hermes-restart" title="Restart Service PM2">
+                <i class="fa-solid fa-arrows-rotate"></i> RESTART
+              </button>
+            </div>
+          </div>
+
+          <!-- Control Item 2: PUBG Scrap & Discord Bot -->
+          <div class="control-box box-amber">
+            <div class="control-box-header">
+              <div class="c-info">
+                <i class="fa-solid fa-crosshairs text-amber"></i>
+                <div>
+                  <strong>PUBG Scrap & Discord Bot</strong>
+                  <span class="c-sub">Scraper Cron 18:00 WIB • Discord Gateway</span>
+                </div>
+              </div>
+              <span class="indicator-badge badge-on" id="ctrl-pubg-status-badge">ACTIVE</span>
+            </div>
+            <p class="control-desc">
+              Menjalankan background scraping match PUBG & bot Discord harian. Hentikan untuk mematikan koneksi Discord dan scheduler cron tanpa mematikan Web Dashboard ini.
+            </p>
+            <div class="control-metrics-mini">
+              <span>Status Bot: <strong id="ctrl-pubg-bot-status">Aktif & Terhubung</strong></span>
+              <span>Jadwal Cron: <strong>18:00 WIB</strong></span>
+            </div>
+            <div class="control-btn-group">
+              <button type="button" class="btn-ctrl btn-stop-danger" id="btn-pubg-stop" title="Hentikan koneksi bot Discord & scraper otomatis">
+                <i class="fa-solid fa-stop"></i> STOP BOT & SCRAPER
+              </button>
+              <button type="button" class="btn-ctrl btn-start-success" id="btn-pubg-start" style="display: none;" title="Nyalakan kembali bot Discord & scraper otomatis">
+                <i class="fa-solid fa-play"></i> START BOT & SCRAPER
+              </button>
+              <button type="button" class="btn-ctrl btn-restart-secondary" id="btn-pubg-restart" title="Restart Scheduler & Koneksi">
+                <i class="fa-solid fa-arrows-rotate"></i> RESTART
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dual Project Launcher Cards -->
+    <section class="projects-launcher-section">
+      <div class="section-title-bar">
+        <h3><i class="fa-solid fa-cubes-stacked text-cyan"></i> APLIKASI AKTIF DI VPS INI</h3>
+        <span class="sub-info">Pilih aplikasi untuk masuk ke dashboard khusus atau konfigurasi</span>
+      </div>
+
+      <div class="projects-grid">
+        <!-- Project 1: PUBG Scraper -->
+        <div class="project-card pubg-project-card">
+          <div class="project-card-header">
+            <div class="project-icon-box gold-glow">
+              <i class="fa-solid fa-crosshairs"></i>
+            </div>
+            <div class="project-title-box">
+              <span class="project-tag">WEB DASHBOARD & BOT DISCORD</span>
+              <h4>PUBG STEAM SQUAD TRACKER</h4>
+            </div>
+            <span class="project-status-badge badge-on">ONLINE • PORT 3000</span>
+          </div>
+
+          <p class="project-description">
+            Scraping data statistik harian PUBG Steam (Chicken Dinners, Kills, K/D, Damage), leaderboard squad, dan bot Discord dengan roasting & pujian otomatis setiap pukul 18:00 WIB.
+          </p>
+
+          <div class="project-meta-row">
+            <div class="p-meta">
+              <span>Route URL:</span>
+              <code>/pubg-scrap</code>
+            </div>
+            <div class="p-meta">
+              <span>Jadwal Laporan:</span>
+              <strong>18:00 WIB</strong>
+            </div>
+            <div class="p-meta">
+              <span>Platform:</span>
+              <strong>Steam PC</strong>
+            </div>
+          </div>
+
+          <div class="project-action-row">
+            <a href="/pubg-scrap" class="btn-tactical btn-amber project-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              <span>BUKA DASHBOARD PUBG (/pubg-scrap)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Project 2: Hermes AI Assistant -->
+        <div class="project-card hermes-project-card">
+          <div class="project-card-header">
+            <div class="project-icon-box violet-glow">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <div class="project-title-box">
+              <span class="project-tag text-violet">AI AGENT & MULTI-CONNECTOR</span>
+              <h4>HERMES AI ASSISTANT HUB</h4>
+            </div>
+            <span class="project-status-badge badge-tokens">ONLINE • PORT 3001</span>
+          </div>
+
+          <p class="project-description">
+            Asisten AI cerdas berbasis model <strong>Nous Hermes 3</strong> via OpenRouter. Terhubung langsung ke <strong>Telegram Bot</strong> dan <strong>Discord Bot</strong> dengan manajemen kuota batas token (Token Limiter).
+          </p>
+
+          <div class="project-meta-row">
+            <div class="p-meta">
+              <span>Model Default:</span>
+              <strong id="card-hermes-model">Hermes 3 (70B)</strong>
+            </div>
+            <div class="p-meta">
+              <span>Token Terpakai:</span>
+              <strong id="card-tok-used">0 Tok</strong>
+            </div>
+            <div class="p-meta">
+              <span>Saldo Tersedia:</span>
+              <strong id="card-tok-credit" class="text-cyan">$100.00</strong>
+            </div>
+          </div>
+
+          <div class="project-tokens-quick-bar">
+            <div class="quick-bar-meta">
+              <span><i class="fa-solid fa-gift text-green"></i> Free Requests: <strong id="card-tok-free">50/50</strong></span>
+              <span class="text-muted"><i class="fa-solid fa-shield-halved"></i> Max/Req: <strong id="card-hermes-tokens">1000</strong></span>
+            </div>
+            <div class="tok-prog-track">
+              <div class="tok-prog-fill fill-cyan" id="card-tok-bar" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <div class="project-action-row" style="display: flex; gap: 10px; margin-top: 10px;">
+            <button type="button" class="btn-tactical btn-violet project-btn" id="btn-card-open-hermes" style="flex: 1;">
+              <i class="fa-solid fa-sliders"></i>
+              <span>KONTROL HERMES</span>
+            </button>
+            <button type="button" class="btn-tactical btn-cyan project-btn" id="btn-card-open-tokens" style="flex: 1;" title="Buka grafik analisis pemakaian & sisa kuota token">
+              <i class="fa-solid fa-chart-pie"></i>
+              <span>GRAFIK TOKEN</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PM2 Processes Table -->
+    <section class="vps-pm2-section">
+      <div class="vps-card">
+        <div class="card-header-tactical">
+          <div class="card-title-group">
+            <i class="fa-solid fa-list-check text-green"></i>
+            <span class="card-title">DAFTAR SERVICE PM2 DI VPS</span>
+          </div>
+          <span class="status-summary-badge" id="pm2-table-summary">2 Process Aktif</span>
+        </div>
+
+        <div class="table-container">
+          <table class="tactical-table vps-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>NAMA SERVICE</th>
+                <th>PID</th>
+                <th>STATUS</th>
+                <th>CPU</th>
+                <th>MEMORY (RAM)</th>
+                <th>UPTIME</th>
+                <th>RESTART</th>
+                <th>AKSI</th>
+              </tr>
+            </thead>
+            <tbody id="pm2-process-tbody">
+              <tr>
+                <td><code>0</code></td>
+                <td><strong>pubg-tracker-bot</strong></td>
+                <td><span class="badge-pid">--</span></td>
+                <td><span class="indicator-badge badge-on">ONLINE</span></td>
+                <td>0%</td>
+                <td>~108 MB</td>
+                <td>--</td>
+                <td>0</td>
+                <td>
+                  <a href="/pubg-scrap" class="btn-table-action btn-amber-sm">Buka /pubg-scrap</a>
+                </td>
+              </tr>
+              <tr>
+                <td><code>1</code></td>
+                <td><strong>hermes-ai-bot</strong></td>
+                <td><span class="badge-pid">--</span></td>
+                <td><span class="indicator-badge badge-on">ONLINE</span></td>
+                <td>0%</td>
+                <td>~98 MB</td>
+                <td>--</td>
+                <td>0</td>
+                <td>
+                  <button type="button" class="btn-table-action btn-violet-sm" onclick="document.getElementById('btn-open-hermes').click()">Buka Hermes Hub</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Hermes AI Hub (OpenRouter, Telegram, Discord) -->
+  <div id="modal-hermes" class="modal-overlay">
+    <div class="modal-window modal-wide hermes-theme-modal">
+      <div class="modal-header hermes-header">
+        <div class="modal-title-wrap">
+          <div class="hermes-badge-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <div>
+            <h3 class="modal-title">HERMES AI ASSISTANT HUB</h3>
+            <span class="modal-subtitle">OpenRouter (Nous Hermes) • Telegram Bot • Discord Bot • Token Manager</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" data-close="modal-hermes">&times;</button>
+      </div>
+
+      <!-- Quick Status Badges Bar -->
+      <div class="hermes-status-bar">
+        <div class="status-indicator-item" id="hermes-status-openrouter">
+          <i class="fa-solid fa-microchip"></i>
+          <span class="indicator-label">OpenRouter:</span>
+          <span class="indicator-badge badge-off" id="badge-or-status">Checking...</span>
+        </div>
+        <div class="status-indicator-item" id="hermes-status-telegram">
+          <i class="fa-brands fa-telegram"></i>
+          <span class="indicator-label">Telegram:</span>
+          <span class="indicator-badge badge-off" id="badge-tg-status">Checking...</span>
+        </div>
+        <div class="status-indicator-item" id="hermes-status-discord">
+          <i class="fa-brands fa-discord"></i>
+          <span class="indicator-label">Discord:</span>
+          <span class="indicator-badge badge-off" id="badge-dc-status">Checking...</span>
+        </div>
+        <div class="status-indicator-item">
+          <i class="fa-solid fa-coins"></i>
+          <span class="indicator-label">Token Terpakai:</span>
+          <span class="indicator-badge badge-tokens" id="badge-total-tokens">0</span>
+        </div>
+        <div class="status-indicator-item" id="hermes-status-credit">
+          <i class="fa-solid fa-wallet text-cyan"></i>
+          <span class="indicator-label">Saldo Tersedia:</span>
+          <span class="indicator-badge badge-on" id="badge-remaining-credits">$100.00</span>
+        </div>
+      </div>
+
+      <!-- Modal Nav Tabs -->
+      <div class="modal-tabs">
+        <button type="button" class="modal-tab-btn active" data-hermestab="htab-config">
+          <i class="fa-solid fa-sliders"></i> OpenRouter & Model
+        </button>
+        <button type="button" class="modal-tab-btn" data-hermestab="htab-telegram">
+          <i class="fa-brands fa-telegram"></i> Bot Telegram
+        </button>
+        <button type="button" class="modal-tab-btn" data-hermestab="htab-discord">
+          <i class="fa-brands fa-discord"></i> Bot Discord
+        </button>
+        <button type="button" class="modal-tab-btn" data-hermestab="htab-chat">
+          <i class="fa-solid fa-comments"></i> Live Test Chat
+        </button>
+        <button type="button" class="modal-tab-btn" data-hermestab="htab-tokens" id="tab-btn-tokens">
+          <i class="fa-solid fa-chart-pie text-cyan"></i> Metrik & Grafik Token
+        </button>
+      </div>
+
+      <div class="modal-body hermes-body">
+        <!-- Tab 1: OpenRouter & Model Config -->
+        <div class="hermes-pane active" id="htab-config">
+          <div class="form-group">
+            <label class="form-label" for="hermes-api-key">
+              <i class="fa-solid fa-key text-violet"></i> API Key OpenRouter
+              <span class="badge-hint">Wajib untuk akses model Hermes</span>
+            </label>
+            <div class="input-with-button">
+              <input type="password" id="hermes-api-key" class="form-input" placeholder="sk-or-v1-xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+              <button type="button" class="btn-input-addon" id="btn-toggle-hermes-key" title="Lihat/Sembunyikan">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <span class="form-help">
+              Ambil API Key dari akun OpenRouter / Muse AI / AntiGravity Anda di <a href="https://openrouter.ai/settings/keys" target="_blank" class="link-cyan">openrouter.ai/settings/keys</a>.
+            </span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label class="form-label" for="hermes-model-select">
+                <i class="fa-solid fa-microchip text-cyan"></i> Pilihan Model AI
+              </label>
+              <select id="hermes-model-select" class="form-input">
+                <option value="nousresearch/hermes-3-llama-3.1-70b" selected>Nous Hermes 3 (Llama 3.1 70B) ⭐ Recommended</option>
+                <option value="nousresearch/hermes-3-llama-3.1-405b">Nous Hermes 3 (Llama 3.1 405B Flagship)</option>
+                <option value="nousresearch/hermes-2-pro-llama-3-8b">Nous Hermes 2 Pro (Llama 3 8B - Ringan & Hemat)</option>
+                <option value="meta-llama/llama-3.3-70b-instruct">Meta Llama 3.3 (70B Instruct)</option>
+                <option value="anthropic/claude-3.5-sonnet">Anthropic Claude 3.5 Sonnet</option>
+                <option value="openai/gpt-4o-mini">OpenAI GPT-4o Mini</option>
+                <option value="custom">Model Kustom Lainnya...</option>
+              </select>
+            </div>
+
+            <div class="form-group col-half" id="custom-model-group" style="display: none;">
+              <label class="form-label" for="hermes-custom-model">
+                <i class="fa-solid fa-pen text-amber"></i> Model Kustom OpenRouter
+              </label>
+              <input type="text" id="hermes-custom-model" class="form-input" placeholder="misal: mistralai/mistral-large">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label class="form-label" for="hermes-max-tokens-slider">
+                <i class="fa-solid fa-shield-halved text-amber"></i> Limit Kuota Token (Max Response Tokens)
+                <span class="badge-token-val" id="token-val-display">1000 tokens</span>
+              </label>
+              <input type="range" id="hermes-max-tokens-slider" min="200" max="4000" step="100" value="1000" class="tactical-slider">
+              <span class="form-help">Membatasi panjang respons model agar token kuota Anda tidak cepat habis dalam satu kali percakapan.</span>
+            </div>
+
+            <div class="form-group col-half">
+              <label class="form-label" for="hermes-temp-slider">
+                <i class="fa-solid fa-temperature-three-quarters text-cyan"></i> Temperature (Kreativitas)
+                <span class="badge-token-val" id="temp-val-display">0.7</span>
+              </label>
+              <input type="range" id="hermes-temp-slider" min="0.1" max="1.0" step="0.05" value="0.7" class="tactical-slider">
+              <span class="form-help">Nilai lebih rendah (0.2) = lebih faktual & terstruktur. Nilai lebih tinggi (0.8) = lebih kreatif & luwes.</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hermes-system-prompt">
+              <i class="fa-solid fa-user-astronaut text-violet"></i> System Persona Prompt
+            </label>
+            <textarea id="hermes-system-prompt" class="form-input form-textarea" rows="3" placeholder="Instruksi kepribadian Hermes AI..."></textarea>
+            <span class="form-help">Mengatur kepribadian, gaya bahasa, dan keahlian asisten Hermes AI.</span>
+          </div>
+        </div>
+
+        <!-- Tab 2: Telegram Connector -->
+        <div class="hermes-pane" id="htab-telegram">
+          <div class="connector-hero telegram-hero">
+            <div class="connector-icon">
+              <i class="fa-brands fa-telegram"></i>
+            </div>
+            <div class="connector-info">
+              <h4>Konektor Bot Telegram</h4>
+              <p>Mengobrol langsung dengan Hermes AI dari HP atau Desktop melalui aplikasi Telegram.</p>
+            </div>
+            <div class="connector-toggle">
+              <label class="switch-wrap">
+                <input type="checkbox" id="hermes-tg-enabled">
+                <span class="switch-slider"></span>
+              </label>
+              <span class="toggle-text" id="hermes-tg-toggle-label">Nonaktif</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hermes-tg-token">
+              <i class="fa-solid fa-key text-cyan"></i> Token Bot Telegram
+            </label>
+            <input type="password" id="hermes-tg-token" class="form-input" placeholder="123456789:ABCDefgh-IJKLMNopqrstuvwxyz" autocomplete="off">
+          </div>
+
+          <div class="status-box" id="tg-status-card">
+            <div class="status-box-header">
+              <span class="status-box-title">Status Bot Telegram Saat Ini:</span>
+              <span class="indicator-badge badge-off" id="tg-card-badge">Offline</span>
+            </div>
+            <p id="tg-card-desc" class="status-box-detail">Bot belum terhubung atau dinonaktifkan.</p>
+          </div>
+
+          <div class="guide-steps-box">
+            <h5><i class="fa-solid fa-circle-info text-cyan"></i> Cara Mendapatkan Token Telegram (Gratis 1 Menit):</h5>
+            <ol>
+              <li>Buka aplikasi Telegram, cari akun resmi: <b>@BotFather</b>.</li>
+              <li>Kirim perintah <code>/newbot</code>, lalu berikan nama untuk bot Anda (misal: <i>Hermes AI VPS</i>).</li>
+              <li>Buat username yang berakhiran bot (misal: <i>MyHermesAi_bot</i>).</li>
+              <li>Salin token HTTP API (misal: <code>7123456789:AAF...</code>) dan tempel ke kolom di atas.</li>
+              <li>Aktifkan saklar di atas dan klik <b>SIMPAN SEMUA PENGATURAN</b>!</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Tab 3: Discord Connector -->
+        <div class="hermes-pane" id="htab-discord">
+          <div class="connector-hero discord-hero">
+            <div class="connector-icon">
+              <i class="fa-brands fa-discord"></i>
+            </div>
+            <div class="connector-info">
+              <h4>Konektor Bot Discord</h4>
+              <p>Ajak ngobrol Hermes AI di server Discord Anda dengan mention <code>@Hermes</code> atau perintah <code>!hermes</code>.</p>
+            </div>
+            <div class="connector-toggle">
+              <label class="switch-wrap">
+                <input type="checkbox" id="hermes-dc-enabled">
+                <span class="switch-slider"></span>
+              </label>
+              <span class="toggle-text" id="hermes-dc-toggle-label">Nonaktif</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hermes-dc-token">
+              <i class="fa-solid fa-key text-violet"></i> Token Bot Discord
+            </label>
+            <input type="password" id="hermes-dc-token" class="form-input" placeholder="MTIxxxxxxxxxxxxxxxxxxxxxxxx.xxxxxx.xxxxxx" autocomplete="off">
+            <span class="form-help">Bisa menggunakan token bot Discord yang baru atau token bot yang sama.</span>
+          </div>
+
+          <div class="status-box" id="dc-status-card">
+            <div class="status-box-header">
+              <span class="status-box-title">Status Bot Discord Saat Ini:</span>
+              <span class="indicator-badge badge-off" id="dc-card-badge">Offline</span>
+            </div>
+            <p id="dc-card-desc" class="status-box-detail">Bot belum terhubung atau dinonaktifkan.</p>
+          </div>
+
+          <div class="guide-steps-box">
+            <h5><i class="fa-solid fa-circle-info text-violet"></i> Cara Interaksi di Discord:</h5>
+            <ul>
+              <li><b>Mention Bot:</b> Ketik <code>@NamaBot Halo Hermes, tolong jelaskan apa itu VPS!</code></li>
+              <li><b>Command:</b> Ketik <code>!hermes buatin script bash untuk backup</code></li>
+              <li><b>Reset Memori:</b> Ketik <code>!hermes reset</code></li>
+              <li><b>Cek Status Token:</b> Ketik <code>!hermes status</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Tab 4: Live Test Chat -->
+        <div class="hermes-pane" id="htab-chat">
+          <div class="chat-console-wrap">
+            <div class="chat-header-bar">
+              <div class="chat-model-info">
+                <i class="fa-solid fa-brain text-violet"></i>
+                <span id="chat-active-model-display">Model: Hermes 3 70B</span>
+              </div>
+              <button type="button" class="btn-mini btn-secondary" id="btn-reset-chat-mem" title="Hapus memori percakapan saat ini">
+                <i class="fa-solid fa-trash-can"></i> Reset Sesi
+              </button>
+            </div>
+
+            <div class="chat-messages-container" id="hermes-chat-messages">
+              <div class="chat-bubble bubble-hermes">
+                <div class="bubble-sender"><i class="fa-solid fa-brain"></i> Hermes AI</div>
+                <div class="bubble-text">Halo! Saya adalah **Hermes AI** yang berjalan di VPS Anda. Masukkan OpenRouter API Key Anda di tab pengaturan, lalu uji coba kirim pesan di sini!</div>
+              </div>
+            </div>
+
+            <div class="chat-input-bar">
+              <input type="text" id="hermes-chat-input" class="form-input chat-input-field" placeholder="Ketik pesan untuk Hermes AI... (Tekan Enter)">
+              <button type="button" class="btn-tactical btn-violet" id="btn-send-hermes-chat">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>KIRIM</span>
+              </button>
+            </div>
+
+            <div class="chat-meta-bar" id="chat-meta-bar">
+              <span id="chat-tokens-info"><i class="fa-solid fa-coins"></i> Token: 0 prompt + 0 reply = 0 total</span>
+              <span id="chat-latency-info"><i class="fa-solid fa-stopwatch"></i> Latency: 0 ms</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: Token & Quota Analytics with Interactive Canvas Charts -->
+        <div class="hermes-pane" id="htab-tokens">
+          <div class="tokens-analytics-header">
+            <div class="t-head-left">
+              <h4><i class="fa-solid fa-chart-line text-cyan"></i> METRIK TOKEN & SALDO OPENROUTER</h4>
+              <p>Visualisasi pemakaian token AI, saldo kuota akun, dan grafik histori percakapan</p>
+            </div>
+            <button type="button" class="btn-tactical btn-cyan btn-sm" id="btn-refresh-token-metrics" title="Ambil data kuota terbaru dari OpenRouter API">
+              <i class="fa-solid fa-arrows-rotate" id="token-refresh-icon"></i>
+              <span>SYNC OPENROUTER</span>
+            </button>
+          </div>
+
+          <!-- 4 KPI Cards Grid -->
+          <div class="tok-kpi-grid">
+            <div class="tok-card tok-card-used">
+              <div class="tok-card-header">
+                <span class="tok-label">TOKEN TERPAKAI</span>
+                <i class="fa-solid fa-coins text-amber"></i>
+              </div>
+              <div class="tok-main-stat">
+                <span class="tok-number" id="tok-stat-total">0</span>
+                <span class="tok-unit">Tokens</span>
+              </div>
+              <div class="tok-sub-chips">
+                <span class="chip-mini chip-cyan" title="Prompt Tokens (Input pengguna)">Prompt: <strong id="tok-stat-prompt">0</strong></span>
+                <span class="chip-mini chip-violet" title="Completion Tokens (Respons AI)">Reply: <strong id="tok-stat-reply">0</strong></span>
+              </div>
+              <div class="tok-card-foot">
+                <span id="tok-stat-calls">0 Panggilan Percakapan</span>
+              </div>
+            </div>
+
+            <div class="tok-card tok-card-remaining">
+              <div class="tok-card-header">
+                <span class="tok-label">KREDIT / SALDO TERSEDIA</span>
+                <i class="fa-solid fa-wallet text-cyan"></i>
+              </div>
+              <div class="tok-main-stat">
+                <span class="tok-number text-cyan" id="tok-stat-credits-remaining">$100.00</span>
+              </div>
+              <div class="tok-progress-container">
+                <div class="tok-prog-track">
+                  <div class="tok-prog-fill fill-cyan" id="tok-fill-credit" style="width: 100%;"></div>
+                </div>
+                <div class="tok-prog-meta">
+                  <span>Dari Limit: <strong id="tok-stat-credits-total">$100.00</strong></span>
+                  <span id="tok-stat-credits-percent" class="text-cyan">100%</span>
+                </div>
+              </div>
+              <div class="tok-card-foot">
+                <span class="badge-hint-green" id="tok-account-tier">Akun Aktif (OpenRouter)</span>
+              </div>
+            </div>
+
+            <div class="tok-card tok-card-free">
+              <div class="tok-card-header">
+                <span class="tok-label">REQUEST HARIAN GRATIS</span>
+                <i class="fa-solid fa-gift text-green"></i>
+              </div>
+              <div class="tok-main-stat">
+                <span class="tok-number text-green" id="tok-stat-free-req">50 / 50</span>
+              </div>
+              <div class="tok-progress-container">
+                <div class="tok-prog-track">
+                  <div class="tok-prog-fill fill-green" id="tok-fill-free" style="width: 100%;"></div>
+                </div>
+                <div class="tok-prog-meta">
+                  <span>Reset Harian</span>
+                  <span class="text-green">50 limit/hari</span>
+                </div>
+              </div>
+              <div class="tok-card-foot">
+                <span>Free Tier Models Ready</span>
+              </div>
+            </div>
+
+            <div class="tok-card tok-card-limit">
+              <div class="tok-card-header">
+                <span class="tok-label">MAX TOKENS / CHAT</span>
+                <i class="fa-solid fa-shield-halved text-violet"></i>
+              </div>
+              <div class="tok-main-stat">
+                <span class="tok-number text-violet" id="tok-stat-max-setting">1,000</span>
+                <span class="tok-unit">Tokens</span>
+              </div>
+              <div class="tok-sub-chips">
+                <span class="chip-mini chip-violet">Model: <strong id="tok-stat-model">Hermes 3 70B</strong></span>
+              </div>
+              <div class="tok-card-foot">
+                <span>Proteksi Limit Token Aktif</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Charts Grid -->
+          <div class="tok-charts-grid">
+            <!-- Chart 1: Timeline History -->
+            <div class="tok-chart-box chart-wide">
+              <div class="tok-chart-head">
+                <div class="tok-chart-title">
+                  <i class="fa-solid fa-chart-area text-violet"></i>
+                  <span>Grafik Riwayat Konsumsi Token per Percakapan</span>
+                </div>
+                <div class="tok-chart-legend">
+                  <span class="l-item"><span class="l-dot dot-violet"></span> Reply Tokens (Output)</span>
+                  <span class="l-item"><span class="l-dot dot-cyan"></span> Prompt Tokens (Input)</span>
+                </div>
+              </div>
+              <div class="tok-canvas-wrap">
+                <canvas id="canvas-token-timeline" height="170"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 2: Proportion Donut / Ratio -->
+            <div class="tok-chart-box chart-narrow">
+              <div class="tok-chart-head">
+                <div class="tok-chart-title">
+                  <i class="fa-solid fa-chart-pie text-cyan"></i>
+                  <span>Rasio Distribusi Token</span>
+                </div>
+              </div>
+              <div class="tok-canvas-wrap donut-wrap">
+                <canvas id="canvas-token-donut" height="170"></canvas>
+              </div>
+              <div class="donut-stats-row">
+                <div class="d-stat"><span class="d-dot dot-cyan"></span> Input: <strong id="donut-pct-prompt">0%</strong></div>
+                <div class="d-stat"><span class="d-dot dot-violet"></span> Output: <strong id="donut-pct-reply">0%</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- History Table -->
+          <div class="tok-history-section">
+            <div class="tok-section-title">
+              <i class="fa-solid fa-clock-rotate-left text-amber"></i>
+              <span>Riwayat Percakapan & Penggunaan Token Terakhir</span>
+            </div>
+            <div class="tok-table-wrap">
+              <table class="tok-table">
+                <thead>
+                  <tr>
+                    <th>WAKTU</th>
+                    <th>MODEL</th>
+                    <th>PROMPT TOKENS</th>
+                    <th>REPLY TOKENS</th>
+                    <th>TOTAL TOKENS</th>
+                    <th>LATENCY</th>
+                  </tr>
+                </thead>
+                <tbody id="tok-history-tbody">
+                  <tr>
+                    <td colspan="6" class="text-muted text-center" style="text-align: center; padding: 18px;">Belum ada riwayat percakapan yang tercatat.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer hermes-modal-footer">
+        <div class="footer-left-status">
+          <span id="hermes-save-status-indicator"></span>
+        </div>
+        <div class="footer-actions">
+          <button type="button" class="btn-tactical btn-secondary" data-close="modal-hermes">TUTUP</button>
+          <button type="button" class="btn-tactical btn-violet" id="btn-save-hermes-config">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>SIMPAN SEMUA PENGATURAN</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Include App Controller & Dashboard Controller -->
+  <script src="vps-dashboard.js"></script>
+</body>
+</html>

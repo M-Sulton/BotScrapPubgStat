@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PUBG BATTLEGROUNDS - Steam Squad Tracker & Discord Daily Banter</title>
+  <meta name="description" content="Dashboard statistik harian PUBG Steam: Chicken Dinners, K/D, Leaderboard, dan integrasi bot Discord dengan ejekan & pujian otomatis setiap jam 18:00 WIB.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="pubg-theme">
+  <!-- Tactical Scanline & Vignette Effect -->
+  <div class="hud-overlay"></div>
+  <div class="ambient-glow"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="tactical-header">
+    <div class="header-left">
+      <div class="pubg-badge">
+        <span class="pubg-title">PUBG</span>
+        <span class="pubg-subtitle">BATTLEGROUNDS</span>
+      </div>
+      <div class="header-divider"></div>
+      <div class="steam-status-chip">
+        <i class="fa-brands fa-steam"></i>
+        <span>STEAM SQUAD TRACKER</span>
+        <div class="live-dot pulse"></div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="tactical-clock" id="live-clock">
+        <i class="fa-regular fa-clock"></i>
+        <span id="clock-time">--:--:-- WIB</span>
+        <span class="clock-label">NEXT REPORT: 18:00 WIB</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <a href="/" class="btn-tactical btn-cyan" style="text-decoration: none;" title="Kembali ke Dashboard Utama VPS (Server Status)">
+        <i class="fa-solid fa-server"></i>
+        <span>SERVER STATUS</span>
+      </a>
+
+      <div class="discord-chip" id="discord-indicator">
+        <i class="fa-brands fa-discord"></i>
+        <span id="discord-status-text">Checking Discord...</span>
+      </div>
+
+      <button id="btn-toggle-pubg-service" class="btn-tactical btn-danger-soft" title="Matikan / Hidupkan Bot Discord & Scraper Otomatis untuk menghemat RAM/CPU">
+        <i class="fa-solid fa-power-off"></i>
+        <span id="pubg-service-toggle-text">STOP BOT (HEMAT RAM)</span>
+      </button>
+
+      <button id="btn-refresh-stats" class="btn-tactical btn-amber" title="Refresh data dari Steam / Scraper">
+        <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
+        <span>REFRESH STATS</span>
+      </button>
+
+      <button id="btn-open-paste-tracker" class="btn-tactical btn-tracker" title="Paste langsung teks dari Tracker.gg (Match History)">
+        <i class="fa-solid fa-clipboard-check"></i>
+        <span>PASTE TRACKER.GG</span>
+      </button>
+
+      <button id="btn-add-player" class="btn-tactical btn-secondary">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>TAMBAH PLAYER</span>
+      </button>
+
+      <button id="btn-open-hermes" class="btn-tactical btn-hermes" title="Hermes AI Hub (OpenRouter, Telegram, Discord)">
+        <i class="fa-solid fa-brain"></i>
+        <span>HERMES AI</span>
+        <div class="hermes-pulse-dot"></div>
+      </button>
+
+      <button id="btn-open-settings" class="btn-tactical btn-icon" title="Pengaturan Bot & API">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+
+      <button id="btn-open-guide" class="btn-tactical btn-icon" title="Panduan Discord & VPS">
+        <i class="fa-solid fa-book-bookmark"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Dashboard Container -->
+  <main class="dashboard-container">
+    <!-- Hero Banner with Tactical Overview -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="hero-tagline">
+          <span class="tag-badge"><i class="fa-solid fa-crosshairs"></i> DAILY SQUAD MONITOR</span>
+          <span class="tag-date" id="hero-date-display">Sabtu, 3 Oktober 2026</span>
+        </div>
+        <h1 class="hero-headline">STEAM SQUAD BATTLE REPORT</h1>
+        <p class="hero-subtext">
+          Pantau rekor Chicken Dinner hari ini vs kemarin, K/D ratio, damage squad, serta laporan otomatis bot Discord pukul 18:00 WIB lengkap dengan pujian sultan dan ceng-cengan beban!
+        </p>
+      </div>
+
+      <!-- Quick KPI Metric Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card gold-border">
+          <div class="kpi-icon-wrap gold-glow">
+            <i class="fa-solid fa-drumstick-bite"></i>
+          </div>
+          <div class="kpi-data">
+            <span class="kpi-label">TOTAL CHICKEN DINNER</span>
+            <span class="kpi-value gold-text" id="kpi-total-wins">0</span>
+            <span class="kpi-sub" id="kpi-wins-trend">Hari Ini vs Kemarin</span>
+          </div>
+        </div>
+
+        <div class="kpi-card cyan-border">
+          <div class="kpi-icon-wrap cyan-glow">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <div class="kpi-data">
+            <span class="kpi-label">TOTAL MATCHES</span>
+            <span class="kpi-value cyan-text" id="kpi-total-matches">0</span>
+            <span class="kpi-sub" id="kpi-losses-sub">0 Kalah toosoon</span>
+          </div>
+        </div>
+
+        <div class="kpi-card red-border">
+          <div class="kpi-icon-wrap red-glow">
+            <i class="fa-solid fa-skull"></i>
+          </div>
+          <div class="kpi-data">
+            <span class="kpi-label">TOTAL SQUAD KILLS</span>
+            <span class="kpi-value red-text" id="kpi-total-kills">0</span>
+            <span class="kpi-sub" id="kpi-damage-sub">0 Total Damage</span>
+          </div>
+        </div>
+
+        <div class="kpi-card purple-border">
+          <div class="kpi-icon-wrap purple-glow">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <div class="kpi-data">
+            <span class="kpi-label">SULTAN AYAM HARI INI</span>
+            <span class="kpi-value purple-text text-truncate" id="kpi-mvp-name">-</span>
+            <span class="kpi-sub" id="kpi-mvp-stat">MVP of the Day</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Discord Live Banter & Roast Preview Banner -->
+    <section class="discord-banter-section">
+      <div class="banter-card">
+        <div class="banter-header">
+          <div class="banter-title-wrap">
+            <div class="discord-icon-badge">
+              <i class="fa-brands fa-discord"></i>
+            </div>
+            <div>
+              <h2 class="banter-title">PREVIEW CHAT BOT DISCORD (SETIAP 18:00 WIB)</h2>
+              <p class="banter-desc">Inilah pesan yang akan dikirim bot ke channel Discord grup kamu setiap jam 6 sore:</p>
+            </div>
+          </div>
+          <div class="banter-actions">
+            <button id="btn-test-discord" class="btn-tactical btn-discord">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>KIRIM KE DISCORD SEKARANG (TEST)</span>
+            </button>
+            <button id="btn-reroll-banter" class="btn-tactical btn-ghost" title="Acak kata-kata ejekan/pujian">
+              <i class="fa-solid fa-shuffle"></i>
+              <span>ACAK KATA</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="banter-content-grid">
+          <!-- Praise Box -->
+          <div class="banter-box praise-box">
+            <div class="box-tag praise-tag">
+              <i class="fa-solid fa-crown"></i> 👑 PUJIAN SULTAN AYAM (MVP)
+            </div>
+            <div class="box-body" id="preview-praise-text">
+              Memuat data pujian...
+            </div>
+          </div>
+
+          <!-- Roast Box -->
+          <div class="banter-box roast-box">
+            <div class="box-tag roast-tag">
+              <i class="fa-solid fa-skull-crossbones"></i> 💀 EJEKAN BEBAN SQUAD (LOSER)
+            </div>
+            <div class="box-body" id="preview-roast-text">
+              Memuat data ejekan...
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content: Leaderboard & Player Cards -->
+    <div class="content-columns">
+      <!-- Left Column: Tactical Leaderboard Table -->
+      <section class="leaderboard-section">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-ranking-star gold-text"></i>
+            <h2>KLASEMEN LEADERBOARD SQUAD</h2>
+          </div>
+          <span class="section-badge">RANKING REAL-TIME</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="tactical-table" id="leaderboard-table">
+            <thead>
+              <tr>
+                <th class="th-rank">POS</th>
+                <th class="th-player">PLAYER</th>
+                <th class="th-wins">CHICKEN 🍗</th>
+                <th class="th-losses">LOSE ❌</th>
+                <th class="th-kd">K/D</th>
+                <th class="th-kills">KILLS</th>
+                <th class="th-dmg">DAMAGE</th>
+                <th class="th-trend">TREND</th>
+                <th class="th-action">AKSI</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Right Column: Player Cards Grid -->
+      <section class="players-cards-section">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-users text-cyan"></i>
+            <h2>DETAIL KARTU PLAYER HARI INI</h2>
+          </div>
+          <div class="players-counter">
+            <span id="player-count-badge">2 Players</span>
+          </div>
+        </div>
+
+        <div class="cards-grid" id="players-cards-grid">
+          <!-- Rendered via JavaScript -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- MODAL: Tambah Player Baru -->
+  <div class="modal-backdrop" id="modal-add-player">
+    <div class="tactical-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-user-plus text-amber"></i>
+          <h3>TAMBAH PLAYER PUBG STEAM</h3>
+        </div>
+        <button class="modal-close" data-close="modal-add-player">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-add-player">
+          <div class="form-group">
+            <label for="input-player-name">NICKNAME PUBG (IN-GAME STEAM)</label>
+            <input type="text" id="input-player-name" placeholder="Contoh: Petiru, Mugen-K, Shroud..." autocomplete="off">
+            <span class="field-hint">Nama player PUBG di Steam. Boleh kosong jika kamu mengisi Link/Steam ID di bawah.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="input-steam-id">STEAM ID / LINK PROFIL STEAM (OPSIONAL/BISA STEAMID64)</label>
+            <div class="input-steam-wrap">
+              <i class="fa-brands fa-steam steam-field-icon"></i>
+              <input type="text" id="input-steam-id" placeholder="Contoh: 76561198... / https://steamcommunity.com/id/... / Petiru" autocomplete="off">
+            </div>
+            <span class="field-hint">Bisa berupa <b>SteamID64 (17 digit)</b>, <b>Custom ID</b>, atau <b>Link Lengkap Profil Steam</b>.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="input-tracker-url">URL TRACKER.GG (SUMBER SCRAP)</label>
+            <div class="input-tracker-wrap">
+              <i class="fa-solid fa-bullseye tracker-field-icon"></i>
+              <input type="text" id="input-tracker-url" placeholder="https://tracker.gg/pubg/profile/steam/Nickname/overview" autocomplete="off">
+            </div>
+            <span class="field-hint">Default: <code>https://tracker.gg/pubg/profile/steam/{Nickname}/overview</code>. Bisa diganti manual kapan saja.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="select-platform">PLATFORM</label>
+            <select id="select-platform">
+              <option value="steam">Steam (PC)</option>
+              <option value="kakao">Kakao</option>
+            </select>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-tactical btn-ghost" data-close="modal-add-player">BATAL</button>
+            <button type="submit" class="btn-tactical btn-amber">
+              <i class="fa-solid fa-check"></i>
+              SIMPAN & TRACK PLAYER
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Edit Stats Manual (Override / Testing) -->
+  <div class="modal-backdrop" id="modal-edit-stats">
+    <div class="tactical-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-pen-to-square text-amber"></i>
+          <h3>EDIT STATISTIK & PROFIL: <span id="edit-player-name" class="gold-text">Player</span></h3>
+        </div>
+        <button class="modal-close" data-close="modal-edit-stats">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-edit-stats">
+          <input type="hidden" id="edit-player-id">
+
+          <div class="form-group">
+            <div class="label-with-link">
+              <label for="edit-tracker-url" style="margin-bottom: 0;">URL TRACKER.GG (SUMBER SCRAP)</label>
+              <a href="#" id="link-open-tracker" target="_blank" rel="noopener noreferrer" class="link-open-ext">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> BUKA TRACKER.GG ↗
+              </a>
+            </div>
+            <div class="input-tracker-wrap">
+              <i class="fa-solid fa-bullseye tracker-field-icon"></i>
+              <input type="text" id="edit-tracker-url" placeholder="https://tracker.gg/pubg/profile/steam/Petiru/overview">
+            </div>
+            <span class="field-hint">Ganti URL ini jika ingin mengubah target scraping profil player.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-steam-url">LINK / STEAM ID PROFIL</label>
+            <input type="text" id="edit-steam-url" placeholder="https://steamcommunity.com/id/... atau SteamID64">
+            <span class="field-hint">Tautan langsung saat profil Steam pemain ini diklik.</span>
+          </div>
+
+          <!-- Quick Paste from Tracker.gg -->
+          <div class="tracker-paste-box">
+            <div class="tracker-paste-header">
+              <i class="fa-solid fa-clipboard-check text-amber"></i>
+              <span>PASTE MATCH HISTORY DARI TRACKER.GG (PARSE OTOMATIS)</span>
+            </div>
+            <textarea id="edit-tracker-paste-area" rows="3" class="tracker-paste-textarea" placeholder="Copy-paste bagian Match History dari Tracker.gg ke sini, lalu klik 'PARSE OTOMATIS' di bawah..."></textarea>
+            <button type="button" id="btn-parse-edit-paste" class="btn-tactical btn-cyan btn-sm" style="width: 100%; margin-top: 6px;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> PARSE & ISI FORM OTOMATIS
+            </button>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-wins">CHICKEN DINNERS (WINS) 🍗</label>
+              <input type="number" id="edit-wins" min="0" max="99" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-losses">LOSSES ❌</label>
+              <input type="number" id="edit-losses" min="0" max="99" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-kills">TOTAL KILLS 🎯</label>
+              <input type="number" id="edit-kills" min="0" max="999" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-damage">TOTAL DAMAGE 💥</label>
+              <input type="number" id="edit-damage" min="0" max="99999" required>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-tactical btn-ghost" data-close="modal-edit-stats">BATAL</button>
+            <button type="submit" class="btn-tactical btn-amber">
+              <i class="fa-solid fa-floppy-disk"></i>
+              UPDATE STATS
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Quick Paste Data Tracker.gg Langsung -->
+  <div class="modal-backdrop" id="modal-paste-tracker">
+    <div class="tactical-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-bullseye text-amber"></i>
+          <h3>SINKRONISASI DATA TRACKER.GG LANGSUNG</h3>
+        </div>
+        <button class="modal-close" data-close="modal-paste-tracker">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-paste-tracker">
+          <div class="form-group">
+            <label for="select-paste-player">PILIH PLAYER</label>
+            <select id="select-paste-player" required>
+              <!-- Rendered via JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <div class="label-with-link">
+              <label for="paste-tracker-raw" style="margin-bottom: 0;">TEMPEL TEKS DARI TRACKER.GG (MATCH HISTORY)</label>
+              <a href="#" id="link-direct-tracker" target="_blank" rel="noopener noreferrer" class="link-open-ext">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> BUKA PROFIL TRACKER.GG ↗
+              </a>
+            </div>
+            <textarea id="paste-tracker-raw" rows="6" class="tracker-paste-textarea" placeholder="Blok & copy teks dari bagian Match History Tracker.gg (contoh: 'Today 2 0 W 1 Top 5 Kills 8 Assists 2 Damage 995 2nd 15 hours ago...'), lalu paste ke sini..." required></textarea>
+            <span class="field-hint">Sistem akan otomatis mengekstrak Match, Chicken Dinner (Wins), Kalah, Kills, Damage secara presisi tanpa terhalang proteksi Cloudflare!</span>
+          </div>
+
+          <div id="paste-preview-box" class="paste-preview-box" style="display: none;">
+            <div class="paste-preview-title"><i class="fa-solid fa-check"></i> HASIL DETEKSI STATISTIK:</div>
+            <div class="paste-preview-grid">
+              <div><span>Matches:</span> <strong id="prev-matches">0</strong></div>
+              <div><span>Chicken Dinner:</span> <strong id="prev-wins" class="gold-text">0</strong></div>
+              <div><span>Kalah:</span> <strong id="prev-losses">0</strong></div>
+              <div><span>Kills:</span> <strong id="prev-kills">0</strong></div>
+              <div><span>Damage:</span> <strong id="prev-damage">0</strong></div>
+              <div><span>K/D:</span> <strong id="prev-kd">0</strong></div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-tactical btn-ghost" data-close="modal-paste-tracker">BATAL</button>
+            <button type="submit" class="btn-tactical btn-amber">
+              <i class="fa-solid fa-bolt"></i>
+              SINKRONKAN SEKARANG
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Settings Bot Discord & API -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="tactical-modal modal-wide">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-sliders text-amber"></i>
+          <h3>PENGATURAN DISCORD BOT, JADWAL & PUBG API</h3>
+        </div>
+        <button class="modal-close" data-close="modal-settings">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-settings">
+          <div class="settings-section">
+            <h4 class="settings-section-title">
+              <i class="fa-brands fa-discord text-discord"></i> KONEKSI BOT DISCORD
+            </h4>
+            
+            <div class="form-group">
+              <label for="input-discord-token">DISCORD BOT TOKEN</label>
+              <div class="input-password-wrap">
+                <input type="password" id="input-discord-token" placeholder="Tempel Bot Token dari Discord Developer Portal...">
+                <button type="button" class="btn-toggle-pw" id="btn-toggle-token"><i class="fa-solid fa-eye"></i></button>
+              </div>
+              <span class="field-hint">Dapatkan dari: <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal &rarr; Bot &rarr; Reset Token</a></span>
+            </div>
+
+            <div class="form-group">
+              <label for="input-channel-id">TARGET DISCORD CHANNEL ID</label>
+              <input type="text" id="input-channel-id" placeholder="Contoh: 123456789012345678" autocomplete="off">
+              <span class="field-hint">Klik kanan text channel di Discord kamu &rarr; <b>Copy Channel ID</b> (Pastikan Developer Mode aktif di Discord).</span>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h4 class="settings-section-title">
+              <i class="fa-solid fa-clock text-amber"></i> JADWAL LAPORAN OTOMATIS (CRON)
+            </h4>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="input-cron">CRON EXPRESSION</label>
+                <input type="text" id="input-cron" value="0 18 * * *" required>
+                <span class="field-hint">Default: <code>0 18 * * *</code> (Setiap hari jam 18:00 WIB / 6 sore).</span>
+              </div>
+              <div class="form-group">
+                <label for="input-timezone">TIMEZONE</label>
+                <input type="text" id="input-timezone" value="Asia/Jakarta" readonly>
+                <span class="field-hint">Zona Waktu Indonesia Barat (WIB).</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h4 class="settings-section-title">
+              <i class="fa-solid fa-key text-cyan"></i> PUBG OFFICIAL API (OPSIONAL)
+            </h4>
+
+            <div class="form-group">
+              <label for="input-pubg-key">PUBG DEVELOPER API KEY (GRATIS)</label>
+              <input type="password" id="input-pubg-key" placeholder="Bearer eyJhbGciOiJSUzI1NiIs...">
+              <span class="field-hint">Gratis 10 req/menit dari <a href="https://developer.pubg.com" target="_blank" rel="noopener">developer.pubg.com</a>. Jika kosong, sistem otomatis menggunakan web scraper & simulasi real-time.</span>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-tactical btn-ghost" data-close="modal-settings">TUTUP</button>
+            <button type="submit" class="btn-tactical btn-amber">
+              <i class="fa-solid fa-floppy-disk"></i>
+              SIMPAN PENGATURAN
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Panduan Lengkap Discord Bot & VPS -->
+  <div class="modal-backdrop" id="modal-guide">
+    <div class="tactical-modal modal-wide modal-scrollable">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-book-open text-amber"></i>
+          <h3>PANDUAN SETUP DISCORD BOT & DEPLOY KE VPS HERMES</h3>
+        </div>
+        <button class="modal-close" data-close="modal-guide">&times;</button>
+      </div>
+      <div class="modal-body guide-body">
+        <!-- Tab navigation inside guide -->
+        <div class="guide-tabs">
+          <button class="tab-btn active" data-tab="tab-discord">1. CARA MEMBUAT BOT DISCORD</button>
+          <button class="tab-btn" data-tab="tab-commands">2. DAFTAR PERINTAH CHAT BOT</button>
+          <button class="tab-btn" data-tab="tab-vps">3. CARA JALANKAN DI VPS HERMES (24/7)</button>
+        </div>
+
+        <!-- Tab 1: Discord Bot Setup -->
+        <div class="tab-pane active" id="tab-discord">
+          <h4><i class="fa-solid fa-circle-check text-green"></i> Langkah Memasukkan Bot ke Server Discord Kamu:</h4>
+          <ol class="guide-steps">
+            <li>
+              <b>Buka Discord Developer Portal:</b>
+              <p>Buka <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">discord.com/developers/applications</a> dan login dengan akun Discord kamu.</p>
+            </li>
+            <li>
+              <b>Buat Aplikasi Baru:</b>
+              <p>Klik tombol <b>"New Application"</b> di pojok kanan atas, beri nama (misal: <code>PUBG Steam Bot</code>), lalu klik <b>Create</b>.</p>
+            </li>
+            <li>
+              <b>Ambil Bot Token:</b>
+              <p>Di menu sebelah kiri, klik tab <b>Bot</b>. Klik <b>"Reset Token"</b> lalu <b>Copy</b> token tersebut. <i>(PENTING: Masukkan token ini ke tombol Pengaturan di web ini!)</i></p>
+            </li>
+            <li>
+              <b>Aktifkan Privileged Gateway Intents (WAJIB):</b>
+              <p>Masih di tab <b>Bot</b>, scroll ke bawah ke bagian <b>Privileged Gateway Intents</b>. Centang/Aktifkan:</p>
+              <ul>
+                <li>✅ <b>MESSAGE CONTENT INTENT</b> (Wajib agar bot bisa membaca command chat)</li>
+                <li>✅ <b>SERVER MEMBERS INTENT</b></li>
+              </ul>
+              <p>Lalu klik <b>Save Changes</b>.</p>
+            </li>
+            <li>
+              <b>Undang Bot ke Server Discord:</b>
+              <p>Di menu kiri klik <b>OAuth2 &rarr; URL Generator</b>.</p>
+              <p>Pada kolom <i>SCOPES</i>, centang: <b><code>bot</code></b> & <b><code>applications.commands</code></b>.</p>
+              <p>Pada kolom <i>BOT PERMISSIONS</i>, centang: <b>Send Messages</b>, <b>Embed Links</b>, <b>Read Message History</b>, <b>Attach Files</b>.</p>
+              <p>Copy link URL di paling bawah, buka di browser, lalu pilih Server Discord kamu & klik <b>Authorize</b>!</p>
+            </li>
+            <li>
+              <b>Ambil Channel ID Discord:</b>
+              <p>Buka Discord App &rarr; User Settings &rarr; Advanced &rarr; aktifkan <b>Developer Mode</b>.</p>
+              <p>Klik kanan channel Discord tempat bot akan mengirim laporan jam 6 sore &rarr; pilih <b>Copy Channel ID</b>.</p>
+              <p>Tempel Channel ID tersebut ke Pengaturan di website ini!</p>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Tab 2: Commands -->
+        <div class="tab-pane" id="tab-commands">
+          <h4><i class="fa-solid fa-terminal text-cyan"></i> Perintah Chat di Channel Discord:</h4>
+          <p>Setelah bot bergabung, kamu dan teman squad bisa mengetik command berikut di channel:</p>
+          <div class="command-card">
+            <code>!pubg</code> atau <code>!stat</code>
+            <p>Menampilkan laporan lengkap skor, chicken dinners hari ini vs kemarin, dan leaderboard squad.</p>
+          </div>
+          <div class="command-card">
+            <code>!roast</code>
+            <p>Bot akan mengejek player yang paling terbeban / losestreak hari ini dengan bahasa gaul kocak!</p>
+          </div>
+          <div class="command-card">
+            <code>!praise</code>
+            <p>Bot akan memuji player sultan yang berhasil dapat Chicken Dinner terbanyak hari ini.</p>
+          </div>
+          <div class="command-card">
+            <code>!refresh</code>
+            <p>Memaksa bot untuk men-scrape dan mengambil statistik pertandingan terbaru dari Steam.</p>
+          </div>
+          <div class="command-card">
+            <code>!help</code>
+            <p>Menampilkan daftar panduan perintah.</p>
+          </div>
+          <div class="notice-box">
+            <i class="fa-solid fa-bell"></i>
+            <span><b>JADWAL OTOMATIS:</b> Setiap jam <b>18:00 WIB</b> bot akan otomatis mengirim pengumuman klasemen hari itu tanpa perlu diketik!</span>
+          </div>
+        </div>
+
+        <!-- Tab 3: VPS Hermes Setup -->
+        <div class="tab-pane" id="tab-vps">
+          <h4><i class="fa-solid fa-server text-amber"></i> Menjalankan Bot di VPS Hermes (24/7 Non-Stop):</h4>
+          <p>Credential VPS yang kamu berikan:</p>
+          <div class="vps-info-box">
+            <p><b>IP VPS:</b> <code>43.156.17.135</code></p>
+            <p><b>Username:</b> <code>ubuntu</code></p>
+            <p><b>Port:</b> <code>22</code></p>
+          </div>
+          
+          <h5>Langkah Cepat (1-Command Deploy):</h5>
+          <p>Kamu bisa langsung menjalankan script otomatis dari folder project ini di komputer kamu:</p>
+          <pre class="code-block"><code>npm run deploy:vps</code></pre>
+          <p>Atau login ke VPS via terminal SSH:</p>
+          <pre class="code-block"><code>ssh ubuntu@43.156.17.135
+# Masukkan password: tiger-96@-desert
+
+# Install Node.js & PM2 (jika belum ada):
+sudo apt update && sudo apt install -y nodejs npm
+sudo npm install -g pm2
+
+# Jalankan bot di latar belakang 24/7:
+pm2 start server.js --name "pubg-bot"
+pm2 save
+pm2 startup</code></pre>
+          <p>Dengan PM2, bot dan web dashboard akan berjalan 24 jam terus menerus bahkan jika VPS kamu restart!</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-tactical btn-amber" data-close="modal-guide">SAYA MENGERTI</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Hermes AI Hub (OpenRouter, Telegram, Discord) -->
+  <div id="modal-hermes" class="modal-overlay">
+    <div class="modal-window modal-wide hermes-theme-modal">
+      <div class="modal-header hermes-header">
+        <div class="modal-title-wrap">
+          <div class="hermes-badge-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <div>
+            <h3 class="modal-title">HERMES AI ASSISTANT HUB</h3>
+            <span class="modal-subtitle">OpenRouter (Nous Hermes) • Telegram Bot • Discord Bot • Token Manager</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" data-close="modal-hermes">&times;</button>
+      </div>
+
+      <!-- Quick Status Badges Bar -->
+      <div class="hermes-status-bar">
+        <div class="status-indicator-item" id="hermes-status-openrouter">
+          <i class="fa-solid fa-microchip"></i>
+          <span class="indicator-label">OpenRouter:</span>
+          <span class="indicator-badge badge-off" id="badge-or-status">Checking...</span>
+        </div>
+        <div class="status-indicator-item" id="hermes-status-telegram">
+          <i class="fa-brands fa-telegram"></i>
+          <span class="indicator-label">Telegram:</span>
+          <span class="indicator-badge badge-off" id="badge-tg-status">Checking...</span>
+        </div>
+        <div class="status-indicator-item" id="hermes-status-discord">
+          <i class="fa-brands fa-discord"></i>
+          <span class="indicator-label">Discord:</span>
+          <span class="indicator-badge badge-off" id="badge-dc-status">Checking...</span>
+        <div class="status-indicator-item">
+          <i class="fa-solid fa-coins"></i>
+          <span class="indicator-label">Token Terpakai:</span>
+          <span class="indicator-badge badge-tokens" id="badge-total-tokens">0</span>
+        </div>
+        <div class="status-indicator-item" id="hermes-status-credit">
+          <i class="fa-solid fa-wallet text-cyan"></i>
+          <span class="indicator-label">Saldo Tersedia:</span>
+          <span class="indicator-badge badge-on" id="badge-remaining-credits">$100.00</span>
+        </div>
+      </div>
+
+      <!-- Modal Nav Tabs -->
+      <div class="modal-tabs">
+        <button type="button" class="modal-tab-btn active" data-hermestab="htab-config">
+          <i class="fa-solid fa-sliders"></i> OpenRouter & Model
+        </button>
+        <button type="button" class="modal-tab-btn" data-hermestab="htab-telegram">
+          <i class="fa-brands fa-telegram"></i> Bot Telegram
+        </button>
+        <button type="button" class="modal-tab-btn" data-hermestab="htab-discord">
+          <i class="fa-brands fa-discord"></i> Bot Discord
+        </button>
+        <button type="button" class="modal-tab-btn" data-hermestab="htab-chat">
+          <i class="fa-solid fa-comments"></i> Live Test Chat
+        </button>
+        <button type="button" class="modal-tab-btn" data-hermestab="htab-tokens" id="tab-btn-tokens">
+          <i class="fa-solid fa-chart-pie text-cyan"></i> Metrik & Grafik Token
+        </button>
+      </div>
+
+      <div class="modal-body hermes-body">
+        <!-- Tab 1: OpenRouter & Model Config -->
+        <div class="hermes-pane active" id="htab-config">
+          <div class="form-group">
+            <label class="form-label" for="hermes-api-key">
+              <i class="fa-solid fa-key text-violet"></i> API Key OpenRouter
+              <span class="badge-hint">Wajib untuk akses model Hermes</span>
+            </label>
+            <div class="input-with-button">
+              <input type="password" id="hermes-api-key" class="form-input" placeholder="sk-or-v1-xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+              <button type="button" class="btn-input-addon" id="btn-toggle-hermes-key" title="Lihat/Sembunyikan">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <span class="form-help">
+              Ambil API Key dari akun OpenRouter / Muse AI / AntiGravity Anda di <a href="https://openrouter.ai/settings/keys" target="_blank" class="link-cyan">openrouter.ai/settings/keys</a>.
+            </span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label class="form-label" for="hermes-model-select">
+                <i class="fa-solid fa-microchip text-cyan"></i> Pilihan Model AI
+              </label>
+              <select id="hermes-model-select" class="form-input">
+                <option value="nousresearch/hermes-3-llama-3.1-70b" selected>Nous Hermes 3 (Llama 3.1 70B) ⭐ Recommended</option>
+                <option value="nousresearch/hermes-3-llama-3.1-405b">Nous Hermes 3 (Llama 3.1 405B Flagship)</option>
+                <option value="nousresearch/hermes-2-pro-llama-3-8b">Nous Hermes 2 Pro (Llama 3 8B - Ringan & Hemat)</option>
+                <option value="meta-llama/llama-3.3-70b-instruct">Meta Llama 3.3 (70B Instruct)</option>
+                <option value="anthropic/claude-3.5-sonnet">Anthropic Claude 3.5 Sonnet</option>
+                <option value="openai/gpt-4o-mini">OpenAI GPT-4o Mini</option>
+                <option value="custom">Model Kustom Lainnya...</option>
+              </select>
+            </div>
+
+            <div class="form-group col-half" id="custom-model-group" style="display: none;">
+              <label class="form-label" for="hermes-custom-model">
+                <i class="fa-solid fa-pen text-amber"></i> Model Kustom OpenRouter
+              </label>
+              <input type="text" id="hermes-custom-model" class="form-input" placeholder="misal: mistralai/mistral-large">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label class="form-label" for="hermes-max-tokens-slider">
+                <i class="fa-solid fa-shield-halved text-amber"></i> Limit Kuota Token (Max Response Tokens)
+                <span class="badge-token-val" id="token-val-display">1000 tokens</span>
+              </label>
+              <input type="range" id="hermes-max-tokens-slider" min="200" max="4000" step="100" value="1000" class="tactical-slider">
+              <span class="form-help">Membatasi panjang respons model agar token kuota Anda tidak cepat habis dalam satu kali percakapan.</span>
+            </div>
+
+            <div class="form-group col-half">
+              <label class="form-label" for="hermes-temp-slider">
+                <i class="fa-solid fa-temperature-three-quarters text-cyan"></i> Temperature (Kreativitas)
+                <span class="badge-token-val" id="temp-val-display">0.7</span>
+              </label>
+              <input type="range" id="hermes-temp-slider" min="0.1" max="1.0" step="0.05" value="0.7" class="tactical-slider">
+              <span class="form-help">Nilai lebih rendah (0.2) = lebih faktual & terstruktur. Nilai lebih tinggi (0.8) = lebih kreatif & luwes.</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hermes-system-prompt">
+              <i class="fa-solid fa-user-astronaut text-violet"></i> System Persona Prompt
+            </label>
+            <textarea id="hermes-system-prompt" class="form-input form-textarea" rows="3" placeholder="Instruksi kepribadian Hermes AI..."></textarea>
+            <span class="form-help">Mengatur kepribadian, gaya bahasa, dan keahlian asisten Hermes AI.</span>
+          </div>
+        </div>
+
+        <!-- Tab 2: Telegram Connector -->
+        <div class="hermes-pane" id="htab-telegram">
+          <div class="connector-hero telegram-hero">
+            <div class="connector-icon">
+              <i class="fa-brands fa-telegram"></i>
+            </div>
+            <div class="connector-info">
+              <h4>Konektor Bot Telegram</h4>
+              <p>Mengobrol langsung dengan Hermes AI dari HP atau Desktop melalui aplikasi Telegram.</p>
+            </div>
+            <div class="connector-toggle">
+              <label class="switch-wrap">
+                <input type="checkbox" id="hermes-tg-enabled">
+                <span class="switch-slider"></span>
+              </label>
+              <span class="toggle-text" id="hermes-tg-toggle-label">Nonaktif</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hermes-tg-token">
+              <i class="fa-solid fa-key text-cyan"></i> Token Bot Telegram
+            </label>
+            <input type="password" id="hermes-tg-token" class="form-input" placeholder="123456789:ABCDefgh-IJKLMNopqrstuvwxyz" autocomplete="off">
+          </div>
+
+          <div class="status-box" id="tg-status-card">
+            <div class="status-box-header">
+              <span class="status-box-title">Status Bot Telegram Saat Ini:</span>
+              <span class="indicator-badge badge-off" id="tg-card-badge">Offline</span>
+            </div>
+            <p id="tg-card-desc" class="status-box-detail">Bot belum terhubung atau dinonaktifkan.</p>
+          </div>
+
+          <div class="guide-steps-box">
+            <h5><i class="fa-solid fa-circle-info text-cyan"></i> Cara Mendapatkan Token Telegram (Gratis 1 Menit):</h5>
+            <ol>
+              <li>Buka aplikasi Telegram, cari akun resmi: <b>@BotFather</b>.</li>
+              <li>Kirim perintah <code>/newbot</code>, lalu berikan nama untuk bot Anda (misal: <i>Hermes AI VPS</i>).</li>
+              <li>Buat username yang berakhiran bot (misal: <i>MyHermesAi_bot</i>).</li>
+              <li>Salin token HTTP API (misal: <code>7123456789:AAF...</code>) dan tempel ke kolom di atas.</li>
+              <li>Aktifkan saklar di atas dan klik <b>SIMPAN SEMUA PENGATURAN</b>!</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Tab 3: Discord Connector -->
+        <div class="hermes-pane" id="htab-discord">
+          <div class="connector-hero discord-hero">
+            <div class="connector-icon">
+              <i class="fa-brands fa-discord"></i>
+            </div>
+            <div class="connector-info">
+              <h4>Konektor Bot Discord</h4>
+              <p>Ajak ngobrol Hermes AI di server Discord Anda dengan mention <code>@Hermes</code> atau perintah <code>!hermes</code>.</p>
+            </div>
+            <div class="connector-toggle">
+              <label class="switch-wrap">
+                <input type="checkbox" id="hermes-dc-enabled">
+                <span class="switch-slider"></span>
+              </label>
+              <span class="toggle-text" id="hermes-dc-toggle-label">Nonaktif</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hermes-dc-token">
+              <i class="fa-solid fa-key text-violet"></i> Token Bot Discord
+            </label>
+            <input type="password" id="hermes-dc-token" class="form-input" placeholder="MTIxxxxxxxxxxxxxxxxxxxxxxxx.xxxxxx.xxxxxx" autocomplete="off">
+            <span class="form-help">Bisa menggunakan token bot Discord yang baru atau token bot yang sama.</span>
+          </div>
+
+          <div class="status-box" id="dc-status-card">
+            <div class="status-box-header">
+              <span class="status-box-title">Status Bot Discord Saat Ini:</span>
+              <span class="indicator-badge badge-off" id="dc-card-badge">Offline</span>
+            </div>
+            <p id="dc-card-desc" class="status-box-detail">Bot belum terhubung atau dinonaktifkan.</p>
+          </div>
+
+          <div class="guide-steps-box">
+            <h5><i class="fa-solid fa-circle-info text-violet"></i> Cara Interaksi di Discord:</h5>
+            <ul>
+              <li><b>Mention Bot:</b> Ketik <code>@NamaBot Halo Hermes, tolong jelaskan apa itu VPS!</code></li>
+              <li><b>Command:</b> Ketik <code>!hermes buatin script bash untuk backup</code></li>
+              <li><b>Reset Memori:</b> Ketik <code>!hermes reset</code></li>
+              <li><b>Cek Status Token:</b> Ketik <code>!hermes status</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Tab 4: Live Test Chat -->
+        <div class="hermes-pane" id="htab-chat">
+          <div class="chat-console-wrap">
+            <div class="chat-header-bar">
+              <div class="chat-model-info">
+                <i class="fa-solid fa-brain text-violet"></i>
+                <span id="chat-active-model-display">Model: Hermes 3 70B</span>
+              </div>
+              <button type="button" class="btn-mini btn-secondary" id="btn-reset-chat-mem" title="Hapus memori percakapan saat ini">
+                <i class="fa-solid fa-trash-can"></i> Reset Sesi
+              </button>
+            </div>
+
+            <div class="chat-messages-container" id="hermes-chat-messages">
+              <div class="chat-bubble bubble-hermes">
+                <div class="bubble-sender"><i class="fa-solid fa-brain"></i> Hermes AI</div>
+                <div class="bubble-text">Halo! Saya adalah **Hermes AI** yang berjalan di VPS Anda. Masukkan OpenRouter API Key Anda di tab pengaturan, lalu uji coba kirim pesan di sini!</div>
+              </div>
+            </div>
+
+            <div class="chat-input-bar">
+              <input type="text" id="hermes-chat-input" class="form-input chat-input-field" placeholder="Ketik pesan untuk Hermes AI... (Tekan Enter)">
+              <button type="button" class="btn-tactical btn-violet" id="btn-send-hermes-chat">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>KIRIM</span>
+              </button>
+            </div>
+
+            <div class="chat-meta-bar" id="chat-meta-bar">
+              <span id="chat-tokens-info"><i class="fa-solid fa-coins"></i> Token: 0 prompt + 0 reply = 0 total</span>
+              <span id="chat-latency-info"><i class="fa-solid fa-stopwatch"></i> Latency: 0 ms</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: Token & Quota Analytics with Interactive Canvas Charts -->
+        <div class="hermes-pane" id="htab-tokens">
+          <div class="tokens-analytics-header">
+            <div class="t-head-left">
+              <h4><i class="fa-solid fa-chart-line text-cyan"></i> METRIK TOKEN & SALDO OPENROUTER</h4>
+              <p>Visualisasi pemakaian token AI, saldo kuota akun, dan grafik histori percakapan</p>
+            </div>
+            <button type="button" class="btn-tactical btn-cyan btn-sm" id="btn-refresh-token-metrics" title="Ambil data kuota terbaru dari OpenRouter API">
+              <i class="fa-solid fa-arrows-rotate" id="token-refresh-icon"></i>
+              <span>SYNC OPENROUTER</span>
+            </button>
+          </div>
+
+          <!-- 4 KPI Cards Grid -->
+          <div class="tok-kpi-grid">
+            <div class="tok-card tok-card-used">
+              <div class="tok-card-header">
+                <span class="tok-label">TOKEN TERPAKAI</span>
+                <i class="fa-solid fa-coins text-amber"></i>
+              </div>
+              <div class="tok-main-stat">
+                <span class="tok-number" id="tok-stat-total">0</span>
+                <span class="tok-unit">Tokens</span>
+              </div>
+              <div class="tok-sub-chips">
+                <span class="chip-mini chip-cyan" title="Prompt Tokens (Input pengguna)">Prompt: <strong id="tok-stat-prompt">0</strong></span>
+                <span class="chip-mini chip-violet" title="Completion Tokens (Respons AI)">Reply: <strong id="tok-stat-reply">0</strong></span>
+              </div>
+              <div class="tok-card-foot">
+                <span id="tok-stat-calls">0 Panggilan Percakapan</span>
+              </div>
+            </div>
+
+            <div class="tok-card tok-card-remaining">
+              <div class="tok-card-header">
+                <span class="tok-label">KREDIT / SALDO TERSEDIA</span>
+                <i class="fa-solid fa-wallet text-cyan"></i>
+              </div>
+              <div class="tok-main-stat">
+                <span class="tok-number text-cyan" id="tok-stat-credits-remaining">$100.00</span>
+              </div>
+              <div class="tok-progress-container">
+                <div class="tok-prog-track">
+                  <div class="tok-prog-fill fill-cyan" id="tok-fill-credit" style="width: 100%;"></div>
+                </div>
+                <div class="tok-prog-meta">
+                  <span>Dari Limit: <strong id="tok-stat-credits-total">$100.00</strong></span>
+                  <span id="tok-stat-credits-percent" class="text-cyan">100%</span>
+                </div>
+              </div>
+              <div class="tok-card-foot">
+                <span class="badge-hint-green" id="tok-account-tier">Akun Aktif (OpenRouter)</span>
+              </div>
+            </div>
+
+            <div class="tok-card tok-card-free">
+              <div class="tok-card-header">
+                <span class="tok-label">REQUEST HARIAN GRATIS</span>
+                <i class="fa-solid fa-gift text-green"></i>
+              </div>
+              <div class="tok-main-stat">
+                <span class="tok-number text-green" id="tok-stat-free-req">50 / 50</span>
+              </div>
+              <div class="tok-progress-container">
+                <div class="tok-prog-track">
+                  <div class="tok-prog-fill fill-green" id="tok-fill-free" style="width: 100%;"></div>
+                </div>
+                <div class="tok-prog-meta">
+                  <span>Reset Harian</span>
+                  <span class="text-green">50 limit/hari</span>
+                </div>
+              </div>
+              <div class="tok-card-foot">
+                <span>Free Tier Models Ready</span>
+              </div>
+            </div>
+
+            <div class="tok-card tok-card-limit">
+              <div class="tok-card-header">
+                <span class="tok-label">MAX TOKENS / CHAT</span>
+                <i class="fa-solid fa-shield-halved text-violet"></i>
+              </div>
+              <div class="tok-main-stat">
+                <span class="tok-number text-violet" id="tok-stat-max-setting">1,000</span>
+                <span class="tok-unit">Tokens</span>
+              </div>
+              <div class="tok-sub-chips">
+                <span class="chip-mini chip-violet">Model: <strong id="tok-stat-model">Hermes 3 70B</strong></span>
+              </div>
+              <div class="tok-card-foot">
+                <span>Proteksi Limit Token Aktif</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Charts Grid -->
+          <div class="tok-charts-grid">
+            <!-- Chart 1: Timeline History -->
+            <div class="tok-chart-box chart-wide">
+              <div class="tok-chart-head">
+                <div class="tok-chart-title">
+                  <i class="fa-solid fa-chart-area text-violet"></i>
+                  <span>Grafik Riwayat Konsumsi Token per Percakapan</span>
+                </div>
+                <div class="tok-chart-legend">
+                  <span class="l-item"><span class="l-dot dot-violet"></span> Reply Tokens (Output)</span>
+                  <span class="l-item"><span class="l-dot dot-cyan"></span> Prompt Tokens (Input)</span>
+                </div>
+              </div>
+              <div class="tok-canvas-wrap">
+                <canvas id="canvas-token-timeline" height="170"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 2: Proportion Donut / Ratio -->
+            <div class="tok-chart-box chart-narrow">
+              <div class="tok-chart-head">
+                <div class="tok-chart-title">
+                  <i class="fa-solid fa-chart-pie text-cyan"></i>
+                  <span>Rasio Distribusi Token</span>
+                </div>
+              </div>
+              <div class="tok-canvas-wrap donut-wrap">
+                <canvas id="canvas-token-donut" height="170"></canvas>
+              </div>
+              <div class="donut-stats-row">
+                <div class="d-stat"><span class="d-dot dot-cyan"></span> Input: <strong id="donut-pct-prompt">0%</strong></div>
+                <div class="d-stat"><span class="d-dot dot-violet"></span> Output: <strong id="donut-pct-reply">0%</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- History Table -->
+          <div class="tok-history-section">
+            <div class="tok-section-title">
+              <i class="fa-solid fa-clock-rotate-left text-amber"></i>
+              <span>Riwayat Percakapan & Penggunaan Token Terakhir</span>
+            </div>
+            <div class="tok-table-wrap">
+              <table class="tok-table">
+                <thead>
+                  <tr>
+                    <th>WAKTU</th>
+                    <th>MODEL</th>
+                    <th>PROMPT TOKENS</th>
+                    <th>REPLY TOKENS</th>
+                    <th>TOTAL TOKENS</th>
+                    <th>LATENCY</th>
+                  </tr>
+                </thead>
+                <tbody id="tok-history-tbody">
+                  <tr>
+                    <td colspan="6" class="text-muted text-center" style="text-align: center; padding: 18px;">Belum ada riwayat percakapan yang tercatat.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer hermes-modal-footer">
+        <div class="footer-left-status">
+          <span id="hermes-save-status-indicator"></span>
+        </div>
+        <div class="footer-actions">
+          <button type="button" class="btn-tactical btn-secondary" data-close="modal-hermes">TUTUP</button>
+          <button type="button" class="btn-tactical btn-violet" id="btn-save-hermes-config">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>SIMPAN SEMUA PENGATURAN</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

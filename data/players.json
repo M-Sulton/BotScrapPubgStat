@@ -1,0 +1,120 @@
+[
+  {
+    "id": "petiru",
+    "name": "Petiru",
+    "platform": "steam",
+    "steamId": "Petiru",
+    "steamUrl": "https://steamcommunity.com/id/Petiru",
+    "trackerUrl": "https://tracker.gg/pubg/profile/steam/Petiru/overview",
+    "active": true,
+    "avatar": "https://avatars.steamstatic.com/b545f470a1a0c4ec3ef90fa96d44a29a039757f5_full.jpg",
+    "addedAt": "2026-10-03T10:00:00.000Z",
+    "lastUpdated": "2026-10-03T11:06:30.461Z",
+    "today": {
+      "date": "2026-10-03",
+      "matches": 2,
+      "wins": 0,
+      "losses": 2,
+      "kills": 8,
+      "assists": 2,
+      "damage": 995,
+      "kd": 4,
+      "winRate": 0,
+      "top10": 2,
+      "headshots": 2,
+      "longestKill": 215,
+      "recentMatches": [
+        {
+          "id": "m6fv0g",
+          "place": 2,
+          "mode": "Squad-(TPP)",
+          "kills": 6,
+          "assists": 2,
+          "damage": 717,
+          "time": "15 hours ago",
+          "win": false
+        },
+        {
+          "id": "m4o8s2w",
+          "place": 7,
+          "mode": "Squad-(TPP)",
+          "kills": 2,
+          "assists": 0,
+          "damage": 278,
+          "time": "16 hours ago",
+          "win": false
+        }
+      ]
+    },
+    "yesterday": {
+      "date": "Oct 02",
+      "matches": 3,
+      "wins": 0,
+      "losses": 3,
+      "kills": 3,
+      "damage": 380,
+      "kd": 0,
+      "winRate": 0,
+      "top10": 0
+    }
+  },
+  {
+    "id": "mugen-k",
+    "name": "Mugen-K",
+    "platform": "steam",
+    "steamId": "Mugen-K",
+    "steamUrl": "https://steamcommunity.com/id/Mugen-K",
+    "trackerUrl": "https://tracker.gg/pubg/profile/steam/Mugen-K/overview",
+    "active": true,
+    "avatar": "https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg",
+    "addedAt": "2026-10-03T10:00:00.000Z",
+    "lastUpdated": "2026-10-03T11:06:14.504Z",
+    "today": {
+      "date": "2026-10-03",
+      "matches": 2,
+      "wins": 0,
+      "losses": 2,
+      "kills": 0,
+      "assists": 0,
+      "damage": 120,
+      "kd": 0,
+      "winRate": 0,
+      "top10": 2,
+      "headshots": 0,
+      "longestKill": 0,
+      "recentMatches": [
+        {
+          "id": "mk1",
+          "mode": "Squad-(TPP)",
+          "place": 2,
+          "kills": 0,
+          "assists": 0,
+          "damage": 75,
+          "time": "15 hours ago",
+          "win": false
+        },
+        {
+          "id": "mk2",
+          "mode": "Squad-(TPP)",
+          "place": 7,
+          "kills": 0,
+          "assists": 0,
+          "damage": 45,
+          "time": "16 hours ago",
+          "win": false
+        }
+      ]
+    },
+    "yesterday": {
+      "date": "2026-10-02",
+      "matches": 3,
+      "wins": 0,
+      "losses": 3,
+      "kills": 1,
+      "damage": 140,
+      "kd": 0.33,
+      "winRate": 0,
+      "top10": 0
+    }
+  }
+]
